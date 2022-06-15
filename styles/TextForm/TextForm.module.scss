@@ -1,0 +1,17 @@
+
+.form {
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+
+  border: none;
+  border-bottom: 1px solid #ccc;
+
+  font-size: 2rem;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+}
