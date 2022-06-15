@@ -1,7 +1,6 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { getTodoState, setTodoList, Todo } from '../../store/slices/todoSlice';
+import { getTodoState, setTodoList } from '../../store/slices/todoSlice';
 import { useDispatch, useSelector } from '../../store/store';
-import { v4 as uuidv4 } from 'uuid';
 import styles from '../../styles/TextForm/TextForm.module.scss'
 
 export const TextForm = () => {
@@ -26,15 +25,7 @@ export const TextForm = () => {
       alert('Task already exist!')
       return
     }
-    const todo: Todo = {
-      id: uuidv4(),
-      todo: text,
-      isCompleted: false,
-    }
-    dispatch(setTodoList([
-      ...todos,
-      todo
-    ]))
+    dispatch(setTodoList(text, false))
 
     setText('')
   }
