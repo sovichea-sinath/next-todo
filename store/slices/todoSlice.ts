@@ -1,7 +1,7 @@
 import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit'
 
 export interface Todo {
-  id?: string,
+  id: string,
   todo: string,
   isCompleted: boolean,
   createdAt?: Date

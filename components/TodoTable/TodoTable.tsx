@@ -12,7 +12,7 @@ export const TodoTable = () => {
         {todos.map(todo => {
           return (
             <TodoRow
-              key={todo.todo} // should be todo.id
+              key={todo.id}
               {...todo}
             />
           )
