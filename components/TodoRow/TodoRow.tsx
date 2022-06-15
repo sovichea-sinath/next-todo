@@ -1,3 +1,5 @@
+import styles from '../../styles/TodoRow/TodoRow.module.scss'
+
 interface Props {
   id: string,
   todo: string,
@@ -7,6 +9,13 @@ interface Props {
 
 export const TodoRow = (props: Props) => {
   return (
-    <div>TodoRow</div>
+    <div className={styles.container}>
+      <div className={styles.contents}>
+        {props.todo}
+      </div>
+      <div className={styles.actions}>
+        button
+      </div>
+    </div>
   )
 }

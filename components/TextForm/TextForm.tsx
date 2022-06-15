@@ -17,19 +17,26 @@ export const TextForm = () => {
   function onTextSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (text === '') {
-      alert('Task should not be empty')
-    } else {
-      const todo: Todo = {
-        id: uuidv4(),
-        todo: text,
-        isCompleted: false,
-      }
-      dispatch(setTodoList([
-        ...todos,
-      ]))
-
-      setText('')
+      alert('Task should not be empty!')
+      return
     }
+
+    const isTaskExisted = todos.filter(task => task.todo === text).length > 0
+    if (isTaskExisted) {
+      alert('Task already exist!')
+      return
+    }
+    const todo: Todo = {
+      id: uuidv4(),
+      todo: text,
+      isCompleted: false,
+    }
+    dispatch(setTodoList([
+      ...todos,
+      todo
+    ]))
+
+    setText('')
   }
 
   return (
