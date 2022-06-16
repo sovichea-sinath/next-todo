@@ -40,6 +40,14 @@ export const createTodo = createAsyncThunk(
     return response.data
 })
 
+export const deleteTodo = createAsyncThunk(
+  'todos/deleteTodo',
+  async (payload: { id: string }) => {
+    const { id } = payload
+    const response = await axios.delete(`${SERVER_URL}/todo/${id}`)
+    return response.data
+})
+
 export const todoSlice = createSlice({
   name: 'todo',
   initialState,
@@ -66,6 +74,25 @@ export const todoSlice = createSlice({
       })
       .addCase(createTodo.rejected, (state, action) => {
         state.error = action.error.message ?? ''
+      })
+
+    builder
+      .addCase(deleteTodo.fulfilled, (state, action) => {
+        console.log('action.payload', action.payload)
+        const { id } = action.payload
+
+        console.log('state.todos', state.todos)
+        const index = state.todos.findIndex(todo => todo.id === id)
+        if (index === -1) {
+          console.log('id', id)
+          alert(`todo with id: ${id} does not exist!`)
+        }
+  
+        state.todos.splice(index, 1)
+      })
+      .addCase(deleteTodo.rejected, (state, action) => {
+        state.error = action.error.message ?? ''
+        alert(action.error.message ?? '')
       })
   },
 })

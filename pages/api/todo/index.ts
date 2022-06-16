@@ -1,27 +1,21 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
+import * as fs from 'fs'
 
-type Todo = {
+export type Todo = {
   id: string,
   todo: string,
   isCompleted: boolean,
   createdAt?: Date
 }
 
-export const todoList: Todo[] = [{
-  id: 'someid',
-  todo: 'sometask',
-  isCompleted: false,
-  createdAt: new Date()
-}]
-
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   switch (req.method) {
-    case 'POST':
+    case 'POST': {
       const { todo, isCompleted } : { todo: string, isCompleted: boolean } =
         req.body
       const newTodo: Todo = {
@@ -30,13 +24,25 @@ export default function handler(
         isCompleted,
         createdAt: new Date()
       }
-      todoList.push(newTodo)
-      res.status(201).json(newTodo)
-      break;
 
-    case 'GET':
+      const rawData = fs.readFileSync('data.json', 'utf8')
+      let todoList = JSON.parse(rawData)
+
+      todoList.push(newTodo)
+      const json = JSON.stringify(todoList)
+      fs.writeFileSync('data.json', json)
+
+      res.status(201).json(newTodo)
+      break
+    }
+
+    case 'GET': {
+      const rawData = fs.readFileSync('data.json', 'utf8')
+      const todoList = JSON.parse(rawData)
+      
       res.status(200).json(todoList)
-      break;
+      break
+    }
   
     default:
       res.status(400).json("Request method is invalid!")
