@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { getTodoState, setTodoList } from '../../store/slices/todoSlice';
+import { createTodo, getTodoState } from '../../store/slices/todoSlice';
 import { useDispatch, useSelector } from '../../store/store';
 import styles from '../../styles/TextForm/TextForm.module.scss'
 
@@ -13,7 +13,7 @@ export const TextForm = () => {
     setText(e.target.value)
   }
 
-  function onTextSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onTextSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (text === '') {
       alert('Task should not be empty!')
@@ -25,7 +25,7 @@ export const TextForm = () => {
       alert('Task already exist!')
       return
     }
-    dispatch(setTodoList(text, false))
+    await dispatch(createTodo ({todo: text, isCompleted: false})).unwrap()
 
     setText('')
   }
