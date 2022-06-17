@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { createTodo, getTodoState } from '../../store/slices/todoSlice';
+import { createTodo, getTodoState, searchTodoList } from '../../store/slices/todoSlice';
 import { useDispatch, useSelector } from '../../store/store';
 import styles from '../../styles/TextForm/TextForm.module.scss'
 
@@ -11,6 +11,7 @@ export const TextForm = () => {
 
   function onTextChange(e: ChangeEvent<HTMLInputElement>) {
     setText(e.target.value)
+    dispatch(searchTodoList(e.target.value))
   }
 
   async function onTextSubmit(e: FormEvent<HTMLFormElement>) {

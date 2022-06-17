@@ -7,9 +7,7 @@ import styles from "../../styles/TodoTable/TodoTable.module.scss"
 export const TodoTable = () => {
   const dispatch = useDispatch()
   const todoStatus = useSelector(state => state.todo.status)
-  const { todos } = useSelector(getTodoState)
-
-  const [text, setText] = useState('')
+  const { filterTodos } = useSelector(getTodoState)
 
   useEffect(() => {
     if (todoStatus === RequestStatus.IDLE) {
@@ -18,49 +16,23 @@ export const TodoTable = () => {
     }
   }, [todoStatus, dispatch])
 
-  function onTextChange(e: ChangeEvent<HTMLInputElement>) {
-    setText(e.target.value)
-  }
-  
-  async function onTextSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (text === '') {
-      await dispatch(fetchTodos()).unwrap()
-      return
-    }
-
-    await dispatch(fetchTodos({ keywords: text })).unwrap()
-  }
-
   return (
     <div className={styles.container}>
-      {todos.length === 0?
+      {filterTodos.length === 0?
         <div className={styles.empty}>
           There is no tasks to complete.
         </div> :
 
-        <>
-          <form
-            onSubmit={onTextSubmit}
-          >
-            <input
-            onChange={onTextChange}
-              type='text'
-              placeholder="Enter your keywords"
-            />
-          </form>
-
-          <div>
-            {todos.map(todo => {
-              return (
-                <TodoRow
-                  key={todo.id}
-                  {...todo}
-                />
-              )
-            })}
-          </div>
-        </>}
+        <div>
+          {filterTodos.map(todo => {
+            return (
+              <TodoRow
+                key={todo.id}
+                {...todo}
+              />
+            )
+          })}
+        </div>}
     </div>
   )
 }

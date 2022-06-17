@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, Draft, PayloadAction } from '@reduxjs/toolkit'
 import axios from 'axios';
 
 const SERVER_URL = 'http://localhost:3000/api'
@@ -18,12 +18,14 @@ export enum RequestStatus {
 }
 export interface TodoState {
   todos: Todo[],
+  filterTodos: Todo[],
   status: RequestStatus,
   error: string | null
 }
 
 const initialState: TodoState = {
   todos: [],
+  filterTodos: [],
   status: RequestStatus.IDLE,
   error: null
 }
@@ -53,7 +55,16 @@ export const deleteTodo = createAsyncThunk(
 export const todoSlice = createSlice({
   name: 'todo',
   initialState,
-  reducers: {},
+  reducers: {
+    searchTodoList: (
+      state: Draft<typeof initialState>,
+      action: PayloadAction<string>
+    ) => {
+      const pattern = new RegExp(action.payload)
+      const filterTodo = state.todos.filter(todo => pattern.test(todo.todo))
+      state.filterTodos = filterTodo
+    }
+  },
   extraReducers(builder) {
     // get todo
     builder
@@ -64,6 +75,7 @@ export const todoSlice = createSlice({
         state.status = RequestStatus.SUCCEEDED
         // Add any fetched posts to the array
         state.todos = action.payload
+        state.filterTodos = action.payload
       })
       .addCase(fetchTodos.rejected, (state, action) => {
         state.status = RequestStatus.FAILED
@@ -73,6 +85,7 @@ export const todoSlice = createSlice({
     builder
       .addCase(createTodo.fulfilled, (state, action) => {
         state.todos.push(action.payload)
+        state.filterTodos = state.todos
       })
       .addCase(createTodo.rejected, (state, action) => {
         state.error = action.error.message ?? ''
@@ -91,6 +104,7 @@ export const todoSlice = createSlice({
         }
   
         state.todos.splice(index, 1)
+        state.filterTodos = state.todos
       })
       .addCase(deleteTodo.rejected, (state, action) => {
         state.error = action.error.message ?? ''
@@ -101,5 +115,6 @@ export const todoSlice = createSlice({
 
 export const getTodoState = (state: { todo: TodoState }) => state.todo
 
+export const { searchTodoList } = todoSlice.actions
 
 export default todoSlice.reducer
