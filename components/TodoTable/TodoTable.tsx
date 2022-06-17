@@ -25,7 +25,7 @@ export const TodoTable = () => {
 
         <div>
           {todos.reduce((todoList, todo) => {
-            if (pattern.test(todo.todo)) {
+            if ((new RegExp(pattern)).test(todo.todo)) {
               todoList.push(
                 <TodoRow
                   key={todo.id}

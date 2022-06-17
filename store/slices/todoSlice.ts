@@ -18,14 +18,14 @@ export enum RequestStatus {
 }
 export interface TodoState {
   todos: Todo[],
-  pattern: RegExp,
+  pattern: string,
   status: RequestStatus,
   error: string | null
 }
 
 const initialState: TodoState = {
   todos: [],
-  pattern: new RegExp(''),
+  pattern: '',
   status: RequestStatus.IDLE,
   error: null
 }
@@ -52,6 +52,14 @@ export const deleteTodo = createAsyncThunk(
     return response.data
 })
 
+export const editTodo = createAsyncThunk(
+  'todos/editTodo',
+  async (payload: { id: string, data: Partial<Todo> }) => {
+    const { id, data } = payload
+    const response = await axios.patch(`${SERVER_URL}/todo/${id}`, data)
+    return response.data
+})
+
 export const todoSlice = createSlice({
   name: 'todo',
   initialState,
@@ -60,8 +68,7 @@ export const todoSlice = createSlice({
       state: Draft<typeof initialState>,
       action: PayloadAction<string>
     ) => {
-      const pattern = new RegExp(action.payload)
-      state.pattern = pattern
+      state.pattern = action.payload
     }
   },
   extraReducers(builder) {
@@ -103,6 +110,18 @@ export const todoSlice = createSlice({
         state.todos.splice(index, 1)
       })
       .addCase(deleteTodo.rejected, (state, action) => {
+        state.error = action.error.message ?? ''
+        alert(action.error.message ?? '')
+      })
+
+    builder
+      .addCase(editTodo.fulfilled, (state, action) => {
+        const editedTodo: Todo = action.payload
+        const index = state.todos.findIndex(todo => todo.id === editedTodo.id)
+        state.todos[index] = editedTodo
+      })
+
+      .addCase(editTodo.rejected, (state, action) => {
         state.error = action.error.message ?? ''
         alert(action.error.message ?? '')
       })
