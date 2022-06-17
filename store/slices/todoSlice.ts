@@ -28,8 +28,10 @@ const initialState: TodoState = {
   error: null
 }
 
-export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
-  const response = await axios.get(`${SERVER_URL}/todo`)
+export const fetchTodos = createAsyncThunk('todos/fetchTodos', async (payload?: {keywords?: string}) => {
+  const keywords = payload?.keywords
+  const url =(`${SERVER_URL}/todo`) + (keywords? `?keywords=${keywords}` : '')
+  const response = await axios.get(url)
   return response.data
 })
 

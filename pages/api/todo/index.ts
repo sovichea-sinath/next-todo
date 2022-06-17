@@ -14,6 +14,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const keywords = req.query.keywords as string | undefined
   switch (req.method) {
     case 'POST': {
       const { todo, isCompleted } : { todo: string, isCompleted: boolean } =
@@ -38,7 +39,14 @@ export default function handler(
 
     case 'GET': {
       const rawData = fs.readFileSync('data.json', 'utf8')
-      const todoList = JSON.parse(rawData)
+      const todoList: Todo[] = JSON.parse(rawData)
+
+      if (keywords) {
+        const pattern = new RegExp(keywords)
+        const filterList = todoList.filter(task => pattern.test(task.todo))
+        res.status(200).json(filterList)
+        break
+      }
       
       res.status(200).json(todoList)
       break
