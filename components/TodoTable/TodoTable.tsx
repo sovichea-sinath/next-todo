@@ -7,7 +7,7 @@ import styles from "../../styles/TodoTable/TodoTable.module.scss"
 export const TodoTable = () => {
   const dispatch = useDispatch()
   const todoStatus = useSelector(state => state.todo.status)
-  const { filterTodos } = useSelector(getTodoState)
+  const { todos, pattern } = useSelector(getTodoState)
 
   useEffect(() => {
     if (todoStatus === RequestStatus.IDLE) {
@@ -18,20 +18,24 @@ export const TodoTable = () => {
 
   return (
     <div className={styles.container}>
-      {filterTodos.length === 0?
+      {todos.length === 0?
         <div className={styles.empty}>
-          There is no tasks to complete.
+          There is no tasks to complete. Create a new one instead!
         </div> :
 
         <div>
-          {filterTodos.map(todo => {
-            return (
-              <TodoRow
-                key={todo.id}
-                {...todo}
-              />
-            )
-          })}
+          {todos.reduce((todoList, todo) => {
+            if (pattern.test(todo.todo)) {
+              todoList.push(
+                <TodoRow
+                  key={todo.id}
+                  {...todo}
+                />
+              )
+            }
+
+            return todoList
+          }, [] as JSX.Element[])}
         </div>}
     </div>
   )

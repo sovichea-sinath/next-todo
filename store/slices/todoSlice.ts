@@ -18,14 +18,14 @@ export enum RequestStatus {
 }
 export interface TodoState {
   todos: Todo[],
-  filterTodos: Todo[],
+  pattern: RegExp,
   status: RequestStatus,
   error: string | null
 }
 
 const initialState: TodoState = {
   todos: [],
-  filterTodos: [],
+  pattern: new RegExp(''),
   status: RequestStatus.IDLE,
   error: null
 }
@@ -56,13 +56,12 @@ export const todoSlice = createSlice({
   name: 'todo',
   initialState,
   reducers: {
-    searchTodoList: (
+    setSearchPattern: (
       state: Draft<typeof initialState>,
       action: PayloadAction<string>
     ) => {
       const pattern = new RegExp(action.payload)
-      const filterTodo = state.todos.filter(todo => pattern.test(todo.todo))
-      state.filterTodos = filterTodo
+      state.pattern = pattern
     }
   },
   extraReducers(builder) {
@@ -75,7 +74,6 @@ export const todoSlice = createSlice({
         state.status = RequestStatus.SUCCEEDED
         // Add any fetched posts to the array
         state.todos = action.payload
-        state.filterTodos = action.payload
       })
       .addCase(fetchTodos.rejected, (state, action) => {
         state.status = RequestStatus.FAILED
@@ -85,7 +83,6 @@ export const todoSlice = createSlice({
     builder
       .addCase(createTodo.fulfilled, (state, action) => {
         state.todos.push(action.payload)
-        state.filterTodos = state.todos
       })
       .addCase(createTodo.rejected, (state, action) => {
         state.error = action.error.message ?? ''
@@ -104,7 +101,6 @@ export const todoSlice = createSlice({
         }
   
         state.todos.splice(index, 1)
-        state.filterTodos = state.todos
       })
       .addCase(deleteTodo.rejected, (state, action) => {
         state.error = action.error.message ?? ''
@@ -115,6 +111,6 @@ export const todoSlice = createSlice({
 
 export const getTodoState = (state: { todo: TodoState }) => state.todo
 
-export const { searchTodoList } = todoSlice.actions
+export const { setSearchPattern } = todoSlice.actions
 
 export default todoSlice.reducer
