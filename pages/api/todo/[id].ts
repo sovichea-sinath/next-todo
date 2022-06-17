@@ -19,9 +19,28 @@ export default function handler(
       break
     }
 
-    case 'PATCH':
-    
+    case 'PATCH': {
+      const newTodo: Partial<Todo> = req.body
+
+      const rawData = fs.readFileSync('data.json', 'utf8')
+      const todoList: Todo[] = JSON.parse(rawData)
+
+      const index = todoList.findIndex(todo => todo.id === id)
+      if (index === -1) {
+        res.status(400).json(`todo with id: ${id} does not exist!`)
+      }
+
+      todoList[index] = {
+        ...todoList[index],
+        ...newTodo
+      }
+
+      const json = JSON.stringify(todoList)
+      fs.writeFileSync('data.json', json)
+
+      res.status(200).json(todoList[index])
       break
+    }
 
     case 'DELETE': {
 
