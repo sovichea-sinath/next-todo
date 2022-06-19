@@ -1,35 +1,41 @@
-import { ChangeEvent, FormEvent, useState } from 'react';
-import { createTodo, getTodoState, setSearchPattern } from '../../store/slices/todoSlice';
+import { ChangeEvent, FormEvent, RefObject, useState } from 'react';
+import { createTodo, editTodo, getTodoState, setSearchPattern, setSelectedTaskId } from '../../store/slices/todoSlice';
 import { useDispatch, useSelector } from '../../store/store';
 import styles from '../../styles/TextForm/TextForm.module.scss'
 
-export const TextForm = () => {
+type Props = {
+  inputRef: RefObject<HTMLInputElement>
+}
+
+export const TextForm = (props: Props) => {
+  const { inputRef } = props
   const dispatch = useDispatch()
-  const { todos } = useSelector(getTodoState)
-  
-  const [text, setText] = useState('')
+  const { todos, pattern, selectedTaskId } = useSelector(getTodoState)
 
   function onTextChange(e: ChangeEvent<HTMLInputElement>) {
-    setText(e.target.value)
+    e.preventDefault()
     dispatch(setSearchPattern(e.target.value))
   }
 
   async function onTextSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (text === '') {
+    if (pattern === '') {
       alert('Task should not be empty!')
       return
     }
 
-    const isTaskExisted = todos.filter(task => task.todo === text).length > 0
+    const isTaskExisted = todos.filter(task => task.todo === pattern).length > 0
     if (isTaskExisted) {
       alert('Task already exist!')
       return
     }
-    await dispatch(createTodo ({todo: text, isCompleted: false})).unwrap()
+    if (selectedTaskId) {
+      await dispatch(editTodo({id: selectedTaskId, data: { todo: pattern }})).unwrap()
+    } else {
+      await dispatch(createTodo({todo: pattern, isCompleted: false})).unwrap()
+    }
     dispatch(setSearchPattern(''))
-
-    setText('')
+    dispatch(setSelectedTaskId(''))
   }
 
   return (
@@ -38,7 +44,8 @@ export const TextForm = () => {
       onSubmit={onTextSubmit}
     >
       <input
-        value={text}
+        ref={inputRef}
+        value={pattern}
         onChange={onTextChange}
         className={styles.input}
         type='text'

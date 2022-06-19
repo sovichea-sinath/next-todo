@@ -28,6 +28,15 @@
 
     opacity: 0;
 
+    .edit {
+      color: blue;
+      font-size: 1rem;
+      &:hover {
+        text-decoration: underline;
+        cursor:pointer;
+      }
+    }
+
     .delete {
       color: red;
       font-size: 1rem;
@@ -35,6 +44,10 @@
         text-decoration: underline;
         cursor:pointer;
       }
+    }
+
+    @media (max-width: 768px) {
+      opacity: 100;
     }
   }
 

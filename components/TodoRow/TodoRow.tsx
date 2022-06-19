@@ -1,5 +1,5 @@
-import { ChangeEvent } from 'react'
-import { deleteTodo, editTodo, Todo } from '../../store/slices/todoSlice'
+import { RefObject, MouseEvent } from 'react'
+import { deleteTodo, editTodo, setSearchPattern, setSelectedTaskId, Todo } from '../../store/slices/todoSlice'
 import { useDispatch } from '../../store/store'
 import styles from '../../styles/TodoRow/TodoRow.module.scss'
 
@@ -7,12 +7,14 @@ interface Props {
   id: string,
   todo: string,
   isCompleted: boolean,
-  createdAt: Date
+  createdAt: Date,
+
+  inputRef: RefObject<HTMLInputElement>
 }
 
 export const TodoRow = (props: Props) => {
+  const { inputRef } = props
   const dispatch = useDispatch()
-
   
   async function deleteTask(id: string) {
     await dispatch(deleteTodo({ id })).unwrap()
@@ -21,6 +23,20 @@ export const TodoRow = (props: Props) => {
   async function onToggleIsComplete(todo: Todo) {
     const data: Partial<Todo> = { isCompleted: !todo.isCompleted }
     await dispatch(editTodo({id: todo.id, data})).unwrap()
+  }
+
+  function onEdit(e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>, todo: Todo) {
+    e.preventDefault()
+    if (inputRef.current) {
+      inputRef.current.value = todo.todo
+      inputRef.current.focus()
+      dispatch(setSearchPattern(todo.todo))
+      dispatch(setSelectedTaskId(todo.id))
+
+      // trigger onChange
+      // const event = new Event('change', { bubbles: true })
+      // inputRef.current.dispatchEvent(event)
+    }
   }
 
   return (
@@ -34,6 +50,12 @@ export const TodoRow = (props: Props) => {
           checked={props.isCompleted}
           onChange={() => onToggleIsComplete(props)}
         />
+        <div
+          className={styles.edit}
+          onClick={(e) => onEdit(e, props)}
+        >
+          edit
+        </div>
         <div
           className={styles.delete}
           onClick={() => deleteTask(props.id)}

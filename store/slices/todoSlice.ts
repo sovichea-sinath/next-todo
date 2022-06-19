@@ -19,6 +19,7 @@ export enum RequestStatus {
 export interface TodoState {
   todos: Todo[],
   pattern: string,
+  selectedTaskId: string,
   status: RequestStatus,
   error: string | null
 }
@@ -26,6 +27,7 @@ export interface TodoState {
 const initialState: TodoState = {
   todos: [],
   pattern: '',
+  selectedTaskId: '',
   status: RequestStatus.IDLE,
   error: null
 }
@@ -68,7 +70,14 @@ export const todoSlice = createSlice({
       state: Draft<typeof initialState>,
       action: PayloadAction<string>
     ) => {
+      console.log('dispatch did trigger')
       state.pattern = action.payload
+    },
+    setSelectedTaskId: (
+      state: Draft<typeof initialState>,
+      action: PayloadAction<string>
+    ) => {
+      state.selectedTaskId = action.payload
     }
   },
   extraReducers(builder) {
@@ -130,6 +139,6 @@ export const todoSlice = createSlice({
 
 export const getTodoState = (state: { todo: TodoState }) => state.todo
 
-export const { setSearchPattern } = todoSlice.actions
+export const { setSearchPattern, setSelectedTaskId } = todoSlice.actions
 
 export default todoSlice.reducer

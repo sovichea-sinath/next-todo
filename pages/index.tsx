@@ -1,10 +1,13 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
+import { useRef } from 'react'
 import { TextForm, TodoTable } from '../components'
 import styles from '../styles/Home.module.scss'
 
 const Home: NextPage = () => {
+  const inputRef = useRef<HTMLInputElement>(null)
+
   return (
     <div className={styles.container}>
       <Head>
@@ -18,8 +21,12 @@ const Home: NextPage = () => {
       </h1>
 
       <main className={styles.main}>
-        <TextForm></TextForm>
-        <TodoTable></TodoTable>
+        <TextForm
+          inputRef={inputRef}
+        />
+        <TodoTable
+          inputRef={inputRef}
+        />
       </main>
 
       <footer className={styles.footer}>

@@ -1,41 +1,58 @@
 import { fetchTodos, getTodoState, RequestStatus } from "../../store/slices/todoSlice"
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import { RefObject, useEffect } from 'react'
 import { useDispatch, useSelector } from "../../store/store"
 import { TodoRow } from "../TodoRow/TodoRow"
 import styles from "../../styles/TodoTable/TodoTable.module.scss"
 
-export const TodoTable = () => {
+type Props = {
+  inputRef: RefObject<HTMLInputElement>
+}
+
+export const TodoTable = (props: Props) => {
+  const { inputRef } = props
   const dispatch = useDispatch()
   const todoStatus = useSelector(state => state.todo.status)
-  const { todos, pattern } = useSelector(getTodoState)
+  const { todos, pattern, selectedTaskId } = useSelector(getTodoState)
+
+  const filteredTodos = todos.reduce((todoList, todo) => {
+    if ((new RegExp(pattern)).test(todo.todo)) {
+      todoList.push(
+        <TodoRow
+          inputRef={inputRef}
+          key={todo.id}
+          {...todo}
+        />
+      )
+    }
+
+    return todoList
+  }, [] as JSX.Element[])
+  const selectedTodo = todos.find(todo => todo.id === selectedTaskId)
 
   useEffect(() => {
     if (todoStatus === RequestStatus.IDLE) {
-      console.log('here');
       dispatch(fetchTodos())
     }
   }, [todoStatus, dispatch])
 
+  if (selectedTodo) {
+    return (
+      <TodoRow
+        inputRef={inputRef}
+        key={selectedTodo.id}
+        {...selectedTodo}
+      />
+    )
+  }
+
   return (
     <div className={styles.container}>
-      {todos.length === 0?
+      {filteredTodos.length === 0?
         <div className={styles.empty}>
           There is no tasks to complete. Create a new one instead!
         </div> :
-
         <div>
-          {todos.reduce((todoList, todo) => {
-            if ((new RegExp(pattern)).test(todo.todo)) {
-              todoList.push(
-                <TodoRow
-                  key={todo.id}
-                  {...todo}
-                />
-              )
-            }
-
-            return todoList
-          }, [] as JSX.Element[])}
+          {filteredTodos}
         </div>}
     </div>
   )
